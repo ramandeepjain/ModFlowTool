@@ -1,6 +1,4 @@
-import { unionBy } from 'lodash';
-
-import MfModel from './ModflowModel';
+import { unionBy, remove } from 'lodash';
 
 export default class ModflowModelsCollection {
 
@@ -16,18 +14,16 @@ export default class ModflowModelsCollection {
         return this._models.length;
     }
 
-    // addModel(model) {
-    //     if (model instanceof MfModel) {
-    //         this._models.push(model);
-    //     }
-    // }
-
     forEach = ( callback ) => {
         return this._models.forEach( callback );
     };
 
     filter = ( callback ) => {
         return this._models.filter( callback );
+    };
+
+    sort = ( callback ) => {
+        return this._models.sort( callback );
     };
 
     map = ( callback ) => {
@@ -40,13 +36,18 @@ export default class ModflowModelsCollection {
         return this._models.length;
     };
 
+    removeById = ( id ) => {
+        this._models = remove(this._models, m => m.modelId !== id);
+        return this._models.length;
+    };
+
     get baseModel() {
         return this._models.find( m => { return m.isBaseModel; } );
     }
 
-    count() {
+    count = () =>  {
         return this._models.length;
-    }
+    };
 
     countModelsWithResults() {
         let counter = 0;

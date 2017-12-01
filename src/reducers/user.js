@@ -1,9 +1,10 @@
 function initialState() {
     return {
-        error: false,
-        errorMessage: '',
-        username: '',
-        apiKey: localStorage.getItem( 'apiKey' )
+        userName: '',
+        name: '',
+        apiKey: localStorage.getItem( 'apiKey' ),
+        email: '',
+        roles: []
     };
 }
 
@@ -19,10 +20,21 @@ const user = ( state = initialState(), action ) => {
                     apiKey: action.payload.apiKey
                 };
             }
+        case 'UNAUTHORIZED':
         case 'LOGOUT':
             {
                 localStorage.removeItem( 'apiKey' );
                 return initialState();
+            }
+        case 'USER_SET_INFORMATION':
+            {
+                return {
+                    ...state,
+                    userName: action.payload.user_name || state.userName,
+                    name: action.payload.name || state.name,
+                    email: action.payload.email || state.email,
+                    roles: action.payload.roles || state.roles,
+                };
             }
         default:
             {
@@ -33,5 +45,8 @@ const user = ( state = initialState(), action ) => {
 
 export default user;
 
-export const isUserLoggedIn = state => { return state.user.apiKey !== null; };
-export const getApiKey = state => { return state.user.apiKey; };
+export const isUserLoggedIn = state => state.apiKey !== null;
+export const getApiKey = state => state.apiKey;
+export const getUserName = state => state.userName;
+export const getName = state => state.name;
+export const getEmail = state => state.email;

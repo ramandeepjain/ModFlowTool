@@ -7,7 +7,7 @@ import Background from '../../components/tools/Background';
 import Chart from '../../components/tools/ChartT08';
 import Info from '../../components/tools/InfoT08';
 import Parameters from '../../components/tools/Parameters_T08';
-import {changeParameter, calculate, reset, changeSettings} from '../../actions/T08';
+import {changeParameter, calculate, reset, changeSettings, changeInfiltration} from '../../actions/T08';
 import Header from '../../components/tools/Header';
 import Navbar from '../Navbar';
 import Icon from '../../components/primitive/Icon';
@@ -20,7 +20,7 @@ export default class T08 extends React.Component {
     state = {
         navigation: [{
             name: 'Documentation',
-            path: 'https://wiki.inowas.hydro.tu-dresden.de/T08-1D transport model (Ogata-Banks)/',
+            path: 'https://wiki.inowas.hydro.tu-dresden.de/t08-1d-transport-model-ogata-banks/',
             icon: <Icon name="file"/>
         }]
     };
@@ -37,6 +37,9 @@ export default class T08 extends React.Component {
         if ( e.target.name === 'settings' ) {
             this.props.dispatch(changeSettings( e.target.value ));
         }
+        if ( e.target.name === 'Infilt' ) {
+            this.props.dispatch(changeInfiltration( e.target.value ));
+        }
     };
 
     handleReset = (e) => {
@@ -52,24 +55,29 @@ export default class T08 extends React.Component {
         return (
             <div className="app-width">
                 <Navbar links={navigation} />
-                <Header title={'T08-1D transport model (Ogata-Banks)'}/>
+                <Header title={'T08. 1D transport model (Ogata-Banks)'}/>
                 <div className="grid-container">
                     <section className="tile col col-abs-2 stacked">
                         <Background image={this.props.tool.background.image}/>
                     </section>
 
                     <section className="tile col col-abs-3 stretch">
-                        <Chart data={this.props.tool.chart.data} settings={this.props.tool.settings} options={this.props.tool.chart.options}/>
+                        <Chart data={this.props.tool.chart.data} settings={this.props.tool.settings}
+                               c0 = {this.props.tool.parameters[0]} info={this.props.tool.info}
+                               options={this.props.tool.chart.options}/>
                     </section>
                 </div>
 
                 <div className="grid-container">
                     <section className="tile col col-abs-2">
-                        <Info data={this.props.tool.settings} handleChange={this.handleChange}/>
+                        <Info settings ={this.props.tool.settings} x = {this.props.tool.parameters[1]}
+                              t = {this.props.tool.parameters[2]} c0 = {this.props.tool.parameters[0]}
+                              info={this.props.tool.info} handleChange={this.handleChange}/>
                     </section>
 
                     <section className="tile col col-abs-3 stretch">
-                        <Parameters data={this.props.tool.parameters} handleChange={this.handleChange} handleReset={this.handleReset}/>
+                        <Parameters data={this.props.tool.parameters} settings ={this.props.tool.settings}
+                                    handleChange={this.handleChange} handleReset={this.handleReset}/>
                     </section>
                 </div>
             </div>

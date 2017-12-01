@@ -22,7 +22,7 @@ export default class T06 extends React.Component {
             path: 'https://wiki.inowas.hydro.tu-dresden.de/t06-mar-method-selection/',
             icon: <Icon name="file"/>
         }]
-    }
+    };
 
     handleChange = (e) => {
         this.props.dispatch(changeCondition({name: e.target.value, selected: e.target.checked}));
@@ -70,19 +70,47 @@ export default class T06 extends React.Component {
         }
         );
     }
+    addition(a,b){
+        let t= b.filter(function(e) {
+                if (a.indexOf(e) == -1)                {
+                    return true;
+                }
+            });
+        return a.concat(t);
+    }
 
     methods() {
         const selectedConditions = this.props.tool.conditions.filter((c) => {
             return c.selected;
         });
+        const groupSelectedConditions = groupBy(selectedConditions, 'category');
+        let groupSelectedMethods = [];
+        for (const category in groupSelectedConditions) {
+            let selectedMethods = [];
+            for(let i = 0; i <groupSelectedConditions[category].length; i++){
+                selectedMethods = this.addition(selectedMethods, groupSelectedConditions[category][i].applicable_methods);
+            }
+            groupSelectedMethods.push({
+                category: category,
+                selectedMethod: selectedMethods
+            })
+        }
+
+//        for (let i = 0; i < selectedConditions.length; i++) {
+//        for(let i = selectedConditions.length; i  0; i--){
+//            applicable_methods = this.intersect(applicable_methods, selectedConditions[i].applicable_methods);
+//        }
+//        for(let i = 0; i <selectedConditions.length; i++){
+//            applicable_methods = this.addition(applicable_methods, selectedConditions[i].applicable_methods);
+//        }
 
         // get first
-        let applicable_methods = (selectedConditions.length > 0)
-            ? selectedConditions[0].applicable_methods
+        let applicable_methods = (groupSelectedMethods.length > 0)
+            ? groupSelectedMethods[0].selectedMethod
             : [];
 
-        for (let i = 0; i < selectedConditions.length; i++) {
-            applicable_methods = this.intersect(applicable_methods, selectedConditions[i].applicable_methods);
+        for (let i = 0; i < groupSelectedMethods.length; i++) {
+            applicable_methods = this.intersect(applicable_methods, groupSelectedMethods[i].selectedMethod);
         }
 
         return (applicable_methods.map((am) => {
@@ -103,6 +131,11 @@ export default class T06 extends React.Component {
                         {method.highLandNeed
                             ? 'high'
                             : 'low'}
+                    </td>
+                    <td className="method-land-need">
+                        <a href={method.href} target="_blank">
+                            <img className="icon-image" src={method.image}/>
+                        </a>
                     </td>
                 </tr>
             );
@@ -131,6 +164,7 @@ export default class T06 extends React.Component {
                                     <th>MAR methods</th>
                                     <th>Unit costs</th>
                                     <th>Area required</th>
+                                    <th>More information</th>
                                 </tr>
                             </thead>
                             <tbody>

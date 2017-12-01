@@ -1,4 +1,5 @@
-import React from 'react'
+import PropTypes from 'prop-types';
+import React from 'react';
 
 import '../../less/4TileTool.less';
 import '../../less/toolT13.less';
@@ -7,17 +8,35 @@ import image9B from '../../images/tools/T09B.png';
 import image9C from '../../images/tools/T09C.png';
 import image9D from '../../images/tools/T09D.png';
 import image9E from '../../images/tools/T09E.png';
+import Icon from '../../components/primitive/Icon';
+import Navbar from '../Navbar';
 
 
-export default class T09 extends React.Component {
+class T09 extends React.Component {
+
+    state = {
+        navigation: [{
+            name: 'Documentation',
+            path: 'https://wiki.inowas.hydro.tu-dresden.de/t09-simple-saltwater-intrusion-equations/',
+            icon: <Icon name="file"/>
+        }]
+    };
+
+    pushToTool = tool => {
+        return this.props.router.push('/tools/' + tool);
+    };
+
     render() {
+        const { navigation } = this.state;
         return (
             <div className="app-width">
+                <Navbar links={navigation} />
                 <h3>Please select the set of boundary conditions that apply to your problem:</h3>
                 <div className="grid-container">
-                    <a href="../T09A/09A_1" className="tile col col-rel-1-t13">
+                    <a className="col-rel-1-t13" />
+                    <a style={{'cursor': 'pointer'}} onClick={() => this.pushToTool('T09A')}  className="tile col col-rel-1-t13">
                        <div className="div-block">
-                            <h1>T9A</h1>
+                            <h1>T09A</h1>
                             <p className="p-height">
                                 Depth of saltwater interface (Ghyben-Herzberg relation)
                             </p>
@@ -26,7 +45,7 @@ export default class T09 extends React.Component {
                             </div>
                         </div>
                     </a>
-                    <a href="../T09B/09B_1" className="tile col col-rel-1-t13">
+                    <a style={{'cursor': 'pointer'}} onClick={() => this.pushToTool('T09B')}  className="tile col col-rel-1-t13">
                         <div className="div-block">
                             <h1>T09B</h1>
                             <p className="p-height">
@@ -37,7 +56,7 @@ export default class T09 extends React.Component {
                             </div>
                         </div>
                     </a>
-                    <a href="../T09C/09C_1" className="tile col col-rel-1-t13">
+                    <a style={{'cursor': 'pointer'}} onClick={() => this.pushToTool('T09C')}  className="tile col col-rel-1-t13">
                         <div className="div-block">
                             <h1>T09C</h1>
                             <p className="p-height">
@@ -48,7 +67,8 @@ export default class T09 extends React.Component {
                             </div>
                         </div>
                     </a>
-                    <a href="../T09D/09D_1" className="tile col col-rel-1-t13">
+                    { /*
+                    <a style={{'cursor': 'pointer'}} onClick={() => this.pushToTool('T09D')}  className="tile col col-rel-1-t13">
                         <div className="div-block">
                             <h1>T09D</h1>
                             <p className="p-height">
@@ -70,8 +90,16 @@ export default class T09 extends React.Component {
                             </div>
                         </div>
                     </a>
+                    */
+                    }
                 </div>
             </div>
-        )
+        );
     }
 }
+
+T09.propTypes = {
+    router: PropTypes.object
+};
+
+export default T09;

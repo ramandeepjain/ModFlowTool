@@ -2,18 +2,18 @@
 
 import { DefinePlugin, HotModuleReplacementPlugin, NamedModulesPlugin, NoEmitOnErrorsPlugin } from 'webpack';
 
-import DashboardPlugin from 'webpack-dashboard/plugin';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
 
 export default {
-    devtool: '#inline-source-map',
+    devtool: "#inline-source-map",
     devServer: {
         historyApiFallback: true,
         hot: true,
-        stats: 'errors-only'
+        stats: 'minimal',
+        host: "0.0.0.0",
+        disableHostCheck: true
     },
     entry: [
         'webpack-dev-server/client?http://localhost:8080',
@@ -23,9 +23,10 @@ export default {
         path.resolve( __dirname, 'src/index.jsx' )
     ],
     output: {
-        path: path.resolve( __dirname, 'dist/' ),
+        path: path.resolve( __dirname, 'build/' ),
         filename: '[name].js',
-        publicPath: '/'
+        publicPath: '/',
+        sourceMapFilename: '[name].map'
     },
     plugins: [
         new HtmlWebpackPlugin( {
@@ -39,23 +40,10 @@ export default {
         new DefinePlugin( {
             'process.env.NODE_ENV': JSON.stringify( 'development' )
         } ),
-        new ExtractTextPlugin( 'styles.css' ),
         new FaviconsWebpackPlugin( 'images/favicon.png' ),
-        new DashboardPlugin()
     ],
     module: {
         rules: [
-            /* {
-                        test: /\.jsx?$/,
-                        enforce: 'pre',
-                        exclude: /node_modules/,
-                        loader: 'eslint-loader',
-                        options: {
-                            configFile: '.eslintrc',
-                            failOnWarning: false,
-                            failOnError: false
-                        }
-                    }, */
             {
                 test: /\.jsx?$/,
                 use: [ 'source-map-loader' ],
@@ -67,26 +55,25 @@ export default {
                 include: __dirname
             }, {
                 test: /\.less$/,
-                use: ExtractTextPlugin.extract( {
-                    fallback: 'style-loader',
-                    use: [ {
-                        loader: 'css-loader',
-                        options: {
-                            sourceMap: true,
-                            importLoaders: 2
-                        }
-                    }, {
-                        loader: 'postcss-loader',
-                        options: {
-                            sourceMap: true
-                        }
-                    }, {
-                        loader: 'less-loader',
-                        options: {
-                            sourceMap: true
-                        }
-                    } ]
-                } )
+                use: [ {
+                    loader: 'style-loader'
+                }, {
+                    loader: 'css-loader',
+                    options: {
+                        sourceMap: true,
+                        importLoaders: 2
+                    }
+                }, {
+                    loader: 'postcss-loader',
+                    options: {
+                        sourceMap: true
+                    }
+                }, {
+                    loader: 'less-loader',
+                    options: {
+                        sourceMap: true
+                    }
+                } ]
             }, {
                 test: /\.(png|jpe?g|gif|svg)$/,
                 exclude: /icons/,
@@ -120,7 +107,12 @@ export default {
                         }
                     }
                 } ]
-            }
+            },
+            { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=fonts/[name].[hash:4].[ext]'},
+            { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=fonts/[name].[hash:4].[ext]&mimetype=application/font-woff'},
+            { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,loader: 'file-loader?name=fonts/[name].[hash:4].[ext]&mimetype=application/font-woff'},
+            { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader?name=fonts/[name].[hash:4].[ext]&mimetype=application/octet-stream'},
+            { test: /\.csv$/, loader: 'raw-loader'}
         ]
     },
     resolve: {

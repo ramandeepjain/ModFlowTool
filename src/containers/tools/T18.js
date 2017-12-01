@@ -53,7 +53,9 @@ export default class T18 extends React.Component {
                 <Navbar links={navigation}/>
                 <Header title={'T18. SAT basin design'}/>
                 <div className="grid-container">
-                    <section className="tile col col-abs-2 stacked" />
+                    <section className="tile col col-abs-2 stacked">
+                        <Background image={this.props.tool.background.image}/>
+                    </section>
 
                     <section className="tile col col-abs-3 stretch">
                         <Chart data={this.props.tool.chart.data} info={this.props.tool.info} options={this.props.tool.chart.options}/>
@@ -66,7 +68,7 @@ export default class T18 extends React.Component {
                     </section>
 
                     <section className="tile col col-abs-3 stretch">
-                        <Parameters data={this.props.tool.parameters} handleChange={this.handleChange} handleReset={this.handleReset}/>
+                        <Parameters parameters={this.props.tool.parameters} handleChange={this.handleChange} handleReset={this.handleReset}/>
                     </section>
                 </div>
             </div>

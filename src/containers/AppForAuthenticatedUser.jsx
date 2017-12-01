@@ -10,18 +10,18 @@ class AppForAuthenticatedUser extends Component {
         userLoggedIn: PropTypes.bool.isRequired,
         push: PropTypes.func.isRequired,
         children: PropTypes.node
+    };
+
+    constructor( props ) {
+        super( props );
+        this.checkAuthentication( this.props );
     }
 
-    constructor(props) {
-        super(props);
-        this.checkAuthentication(this.props);
+    componentWillReceiveProps( nextProps ) {
+        this.checkAuthentication( nextProps );
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.checkAuthentication(nextProps);
-    }
-
-    checkAuthentication(props) {
+    checkAuthentication( props ) {
         // eslint-disable-next-line no-shadow
         const { userLoggedIn, push } = props;
         if ( !userLoggedIn ) {
@@ -35,7 +35,7 @@ class AppForAuthenticatedUser extends Component {
 }
 
 const mapStateToProps = state => {
-    return {userLoggedIn: isUserLoggedIn( state )};
+    return {userLoggedIn: isUserLoggedIn( state.user )};
 };
 
 // eslint-disable-next-line no-class-assign

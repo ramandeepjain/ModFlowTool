@@ -54,16 +54,22 @@ export default class Parameters extends React.Component {
     };
 
     render() {
+        const settings = this.props.settings;
         const styleupdate = {
             marginTop: "20px"
         };
         const stylelink = {
             marginLeft: "70px"
         };
-        const params = this.props.data.slice(0,8).map(param => {
+        var params = this.props.data.slice(0,9).map(param => {
             return this.renderSlider(param);
         });
-        const params_Kd = this.props.data.slice(8,10).map(param => {
+        if (settings.infiltration === 'OneTime') {
+            params = this.props.data.slice(0,10).map(param => {
+            return this.renderSlider(param);
+        });
+        }
+        const params_Kd = this.props.data.slice(10,12).map(param => {
             return this.renderSlider(param);
         });
         return (
@@ -95,7 +101,7 @@ export default class Parameters extends React.Component {
                             {params_Kd}
                             </tbody>
                         </table>
-                        <button  style={styleupdate} type="Button" onClick={this.closePopup}>Calculate</button>
+                        <button  style={styleupdate} type="Button" onClick={this.closePopup}>Close</button>
                     </div>
                 </Popup>
             </div>

@@ -1,37 +1,43 @@
 import '../less/navbar.less';
 
-import React, { PropTypes } from 'react';
-import { authenticate, logout } from '../actions/user';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { authenticate, loadUserInformation, logout } from '../actions/user';
+import { getApiKey, getName, isUserLoggedIn } from '../reducers/user';
 
 import Icon from '../components/primitive/Icon';
 import { Link } from 'react-router';
 import LoginForm from '../components/LoginForm';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 
-@connect(( store ) => {
-    return { user: store.user, routing: store.routing };
-})
-export default class NavBar extends React.Component {
+class NavBar extends React.Component {
 
-    static propTypes = {
-        dispatch: PropTypes.func.isRequired,
-        user: PropTypes.object.isRequired,
-        routing: PropTypes.object.isRequired,
-        links: PropTypes.array
-    };
-
-    login = ( identifier, password ) => {
-        this.props.dispatch(authenticate( identifier, password ));
+    componentDidMount( ) {
+        const { userLoggedIn } = this.props;
+        if ( userLoggedIn ) {
+            this.loadUserInformation( );
+        }
     }
 
-    logout = ( ) => {
-        this.props.dispatch(logout( ));
+    componentDidUpdate( prevProps ) {
+        const { apiKey, userLoggedIn } = this.props;
+        if ( apiKey !== prevProps.apiKey && userLoggedIn ) {
+            this.loadUserInformation( );
+        }
+    }
+
+    loadUserInformation( ) {
+        // eslint-disable-next-line no-shadow
+        const { name, loadUserInformation } = this.props;
+
+        if ( !name || name === '' ) {
+            loadUserInformation( );
+        }
     }
 
     renderLinks( links, recursionDepth = 0 ) {
-        return links.filter(l => {
-            return l;
-        }).map(( l, index ) => {
+        return links.filter( l => l ).map(( l, index ) => {
             let active = false;
             const currentPath = this.props.routing.locationBeforeTransitions.pathname;
 
@@ -82,16 +88,21 @@ export default class NavBar extends React.Component {
         });
     }
 
+    renderInfo = (info) => <li style={{margin: 5}}><span dangerouslySetInnerHTML={{__html: info}} /></li>;
+
     renderUserNavigation( ) {
-        if ( this.props.user.apiKey ) {
+        // eslint-disable-next-line no-shadow
+        const { userLoggedIn, logout, authenticate, name } = this.props;
+
+        if ( userLoggedIn ) {
             return (
                 <li className="nav-item nav-item-has-children">
                     <span className="nav-element">
-                        <Icon name="person"/>Hey, Guest
+                        <Icon name="person"/>Hey, {name}
                     </span>
                     <ul className="nav-list">
                         <li className="nav-item">
-                            <button className="nav-element" onClick={this.logout}>logout</button>
+                            <button className="nav-element" onClick={logout}>logout</button>
                         </li>
                     </ul>
                 </li>
@@ -104,7 +115,7 @@ export default class NavBar extends React.Component {
                 </span>
                 <ul className="nav-list">
                     <li className="nav-item">
-                        <LoginForm login={this.login}/>
+                        <LoginForm login={authenticate}/>
                     </li>
                 </ul>
             </li>
@@ -134,7 +145,8 @@ export default class NavBar extends React.Component {
                     <nav className="nav-left">
                         <ul className="nav-list">
                             {this.renderLinks( standardLinks )}
-                            {this.props.user.apiKey && this.renderLinks(standardLinksAuthenticationRequired.concat( this.props.links ))}
+                            {this.props.userLoggedIn && this.renderLinks(standardLinksAuthenticationRequired.concat( this.props.links ))}
+                            {!this.props.userLoggedIn && this.props.info && this.renderInfo(this.props.info)}
                         </ul>
                     </nav>
                     <nav className="nav-right">
@@ -148,3 +160,30 @@ export default class NavBar extends React.Component {
         );
     }
 }
+
+const mapStateToProps = ( state, ownProps ) => {
+    return {
+        userLoggedIn: isUserLoggedIn( state.user ),
+        apiKey: getApiKey( state.user ),
+        routing: state.routing,
+        name: getName( state.user ),
+        ...ownProps
+    };
+};
+
+NavBar.propTypes = {
+    userLoggedIn: PropTypes.bool,
+    routing: PropTypes.object,
+    links: PropTypes.array,
+    authenticate: PropTypes.func,
+    logout: PropTypes.func,
+    name: PropTypes.string,
+    loadUserInformation: PropTypes.func,
+    apiKey: PropTypes.string,
+    info: PropTypes.string
+};
+
+// eslint-disable-next-line no-class-assign
+NavBar = withRouter( connect(mapStateToProps, { authenticate, logout, loadUserInformation })( NavBar ));
+
+export default NavBar;

@@ -6,35 +6,61 @@ import Grid from './Grid';
  * ModflowModel Base Class
  */
 export default class ModflowModel {
-
     modelId = null;
     name = null;
     description = null;
     _grid;
-    area = null;
+    _area;
     boundaries = [];
+    _calculationId = null;
     selected = null;
     isBaseModel;
     result;
 
     static fromModflowDetails(details) {
-        const model = new ModflowModel(details.modelId, details.isBaseModel);
-        model.area = details.area;
+        const model = new ModflowModel(details.calculationId, details.isBaseModel);
+        model._area = details.area;
         model.name = details.name;
         model.description = details.description;
-        model._grid = new Grid(details.boundingBox, details.gridSize.n_x, details.gridSize.n_y);
+        model._grid = new Grid(
+            details.boundingBox,
+            details.gridSize.n_x,
+            details.gridSize.n_y
+        );
         model.selected = false;
         return model;
     }
 
-    static fromProps( modelId, isBaseModel, area, name, description, boundingBox, nx, ny, selected){
+    static fromProps(
+        modelId,
+        isBaseModel,
+        area,
+        name,
+        description,
+        boundingBox,
+        nx,
+        ny,
+        calculationId,
+        selected,
+        permissions
+    ) {
         const model = new ModflowModel(modelId, isBaseModel);
-        model.area = area;
+        model._area = area;
         model.name = name;
         model.description = description;
         model._grid = new Grid(boundingBox, nx, ny);
+        model._calculationId = calculationId;
         model.selected = selected;
+        model.permissions = permissions;
         return model;
+    }
+
+    get calculationId() {
+        return this._calculationId;
+    }
+
+    get area() {
+        return this._area;
     }
 
     get grid() {
@@ -51,7 +77,10 @@ export default class ModflowModel {
     }
 
     containsBoundary(boundary) {
-        return this.boundaries.find( b => b.id === boundary.id ) instanceof MfBoundary;
+        return (
+            this.boundaries.find(b => b.id === boundary.id) instanceof
+            MfBoundary
+        );
     }
 
     addBoundary(boundary) {
@@ -60,7 +89,7 @@ export default class ModflowModel {
 
     // doesn't do anything
     updateBoundary(boundary) {
-        this.boundaries.map( b => {
+        this.boundaries.map(b => {
             if (b.id === boundary.id) {
                 return boundary;
             }
@@ -105,7 +134,9 @@ export default class ModflowModel {
 
         const chartData = [];
         chartData.push(this.name);
-        rowData.forEach( v => {chartData.push(v);});
+        rowData.forEach(v => {
+            chartData.push(v);
+        });
         return chartData;
     }
 
@@ -130,13 +161,12 @@ export default class ModflowModel {
             break;
         }
 
-
         const nX = this.grid.nX;
         const xMin = this.grid.boundingBox.southWest.lng;
         const xMax = this.grid.boundingBox.northEast.lng;
         const dX = (xMax - xMin) / nX;
 
-        return Math.round((xMin + (leftBorder * dX)) * 1000) / 1000;
+        return Math.round((xMin + leftBorder * dX) * 1000) / 1000;
     }
 
     chartRightBorderByRowNumber(row) {
@@ -165,7 +195,7 @@ export default class ModflowModel {
         const xMax = this.grid.boundingBox.northEast.lng;
         const dX = (xMax - xMin) / nX;
 
-        return Math.round((xMin + (rightBorder * dX)) * 1000) / 1000;
+        return Math.round((xMin + rightBorder * dX) * 1000) / 1000;
     }
 
     columnXAxis() {
@@ -176,7 +206,7 @@ export default class ModflowModel {
         const dX = (xMax - xMin) / nX;
 
         for (let i = 0; i < nX; i++) {
-            column.push(Math.round((xMin + (i * dX)) * 1000) / 1000);
+            column.push(Math.round((xMin + i * dX) * 1000) / 1000);
         }
 
         return column;
@@ -193,13 +223,13 @@ export default class ModflowModel {
         const dX = (xMax - xMin) / nX;
         const dY = (yMax - yMin) / nY;
 
-        const x = Math.round((xMin + ((col + 0.5) * dX)) * 1000) / 1000;
-        const y = Math.round((yMin + ((row + 0.5) * dY)) * 1000) / 1000;
+        const x = Math.round((xMin + (col + 0.5) * dX) * 1000) / 1000;
+        const y = Math.round((yMin + (row + 0.5) * dY) * 1000) / 1000;
 
-        return {x: x, y: y};
+        return { x: x, y: y };
     }
 
     hasResult() {
-        return (this.result instanceof MfResult);
+        return this.result instanceof MfResult;
     }
 }

@@ -24,7 +24,7 @@ export default class T09F extends React.Component {
             path: 'https://wiki.inowas.hydro.tu-dresden.de/t09-simple-saltwater-intrusion-equations/',
             icon: <Icon name="file"/>
         }]
-    }
+    };
 
     handleChange = (e) => {
         if (e.target.name === 'settings') {
@@ -72,7 +72,7 @@ export default class T09F extends React.Component {
                     </section>
 
                     <section className="tile col col-abs-3 stretch">
-                        <Parameters data={this.props.tool.parameters} handleChange={this.handleChange} handleReset={this.handleReset}/>
+                        <Parameters parameters={this.props.tool.parameters} handleChange={this.handleChange} handleReset={this.handleReset}/>
                     </section>
                 </div>
             </div>
